@@ -45,6 +45,13 @@ RSpec.describe SEPA::CreditTransferTransaction do
       end
     end
 
+    context 'for pain.001.001.09' do
+      it 'should succeed for valid attributes' do
+        expect(SEPA::CreditTransferTransaction.new(:bic => 'SPUEDE2UXXX', :currency => 'EUR')).to be_schema_compatible('pain.001.001.09')
+        expect(SEPA::CreditTransferTransaction.new(:bic => nil)).to be_schema_compatible('pain.001.001.09')
+      end
+    end
+
     context 'for pain.001.001.03.ch.02' do
       it 'should succeed for valid attributes' do
         expect(SEPA::CreditTransferTransaction.new(:bic => 'SPUEDE2UXXX', :currency => 'CHF')).to be_schema_compatible('pain.001.001.03.ch.02')
@@ -53,12 +60,28 @@ RSpec.describe SEPA::CreditTransferTransaction do
   end
 
   context 'Requested date' do
-    it 'should allow valid value' do
+    it 'should allow valid Date' do
       expect(SEPA::CreditTransferTransaction).to accept(nil, Date.new(1999, 1, 1), Date.today, Date.today.next, Date.today + 2, for: :requested_date)
     end
 
-    it 'should not allow invalid value' do
+    it 'should allow valid Time' do
+      expect(SEPA::CreditTransferTransaction).to accept(nil, Time.new(1999, 1, 1), Time.now, Time.now + (60*60*24), for: :requested_date)
+    end
+
+    it 'should allow valid DateTime' do
+      expect(SEPA::CreditTransferTransaction).to accept(nil, DateTime.new(1999, 1, 1), DateTime.now, DateTime.now + 1, DateTime.now + 2, for: :requested_date)
+    end
+
+    it 'should not allow invalid Date' do
       expect(SEPA::CreditTransferTransaction).not_to accept(Date.new(1995,12,21), Date.today - 1, for: :requested_date)
+    end
+
+    it 'should not allow invalid Time' do
+      expect(SEPA::CreditTransferTransaction).not_to accept(Time.new(1995,12,21), Time.now - (60*60*24), for: :requested_date)
+    end
+
+    it 'should not allow invalid DateTime' do
+      expect(SEPA::CreditTransferTransaction).not_to accept(DateTime.new(1995, 12, 21), DateTime.now - 1, for: :requested_date)
     end
   end
 

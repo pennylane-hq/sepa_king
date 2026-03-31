@@ -26,6 +26,16 @@ RSpec.describe SEPA::Transaction do
     end
   end
 
+  context 'RequestedDate' do
+    it 'should accept DateTime value' do
+      expect(SEPA::Transaction).to accept(Date.today, for: :requested_date)
+    end
+
+    it 'should accept Time value' do
+      expect(SEPA::Transaction).to accept(Time.now, for: :requested_date)
+    end
+  end
+
   context 'Address' do
     context 'with address_line' do
       it 'should accept valid value' do
