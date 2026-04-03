@@ -46,9 +46,10 @@ module SEPA
     protected
 
     def validate_requested_date_after(min_requested_date)
-      return unless requested_date.is_a?(Date)
+      return unless requested_date.is_a?(Date) || requested_date.is_a?(Time)
 
-      if requested_date != DEFAULT_REQUESTED_DATE && requested_date < min_requested_date
+      comparable = requested_date.is_a?(Time) ? requested_date.to_date : requested_date
+      if comparable != DEFAULT_REQUESTED_DATE && comparable < min_requested_date
         errors.add(:requested_date, "must be greater or equal to #{min_requested_date}, or nil")
       end
     end
