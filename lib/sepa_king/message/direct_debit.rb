@@ -1,30 +1,28 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module SEPA
   class DirectDebit < Message
     self.account_class = CreditorAccount
     self.transaction_class = DirectDebitTransaction
     self.xml_main_tag = 'CstmrDrctDbtInitn'
-    self.known_schemas = [ PAIN_008_001_02, PAIN_008_003_02, PAIN_008_002_02 ]
+    self.known_schemas = [PAIN_008_001_02, PAIN_008_003_02, PAIN_008_002_02]
 
     validate do |record|
-      if record.transactions.map(&:local_instrument).uniq.size > 1
-        errors.add(:base, 'CORE, COR1 AND B2B must not be mixed in one message!')
-      end
+      errors.add(:base, 'CORE, COR1 AND B2B must not be mixed in one message!') if record.transactions.map(&:local_instrument).uniq.size > 1
     end
 
-  private
+    private
+
     # Find groups of transactions which share the same values of some attributes
     def transaction_group(transaction)
-      { requested_date:   transaction.requested_date,
+      { requested_date: transaction.requested_date,
         local_instrument: transaction.local_instrument,
-        sequence_type:    transaction.sequence_type,
-        batch_booking:    transaction.batch_booking,
-        account:          transaction.creditor_account || account
-      }
+        sequence_type: transaction.sequence_type,
+        batch_booking: transaction.batch_booking,
+        account: transaction.creditor_account || account }
     end
 
-    def build_payment_informations(builder, schema_name)
+    def build_payment_informations(builder, _schema_name)
       # Build a PmtInf block for every group of transactions
       grouped_transactions.each do |group, transactions|
         builder.PmtInf do
@@ -32,7 +30,7 @@ module SEPA
           builder.PmtMtd('DD')
           builder.BtchBookg(group[:batch_booking])
           builder.NbOfTxs(transactions.length)
-          builder.CtrlSum('%.2f' % amount_total(transactions))
+          builder.CtrlSum(format('%.2f', amount_total(transactions)))
           builder.PmtTpInf do
             builder.SvcLvl do
               builder.Cd('SEPA')
@@ -103,9 +101,7 @@ module SEPA
         end
         if transaction.original_creditor_account
           builder.OrgnlCdtrSchmeId do
-            if transaction.original_creditor_account.name
-              builder.Nm(transaction.original_creditor_account.name)
-            end
+            builder.Nm(transaction.original_creditor_account.name) if transaction.original_creditor_account.name
             if transaction.original_creditor_account.creditor_identifier
               builder.Id do
                 builder.PrvtId do
@@ -126,12 +122,10 @@ module SEPA
     def build_transaction(builder, transaction)
       builder.DrctDbtTxInf do
         builder.PmtId do
-          if transaction.instruction.present?
-            builder.InstrId(transaction.instruction)
-          end
+          builder.InstrId(transaction.instruction) if transaction.instruction.present?
           builder.EndToEndId(transaction.reference)
         end
-        builder.InstdAmt('%.2f' % transaction.amount, Ccy: transaction.currency)
+        builder.InstdAmt(format('%.2f', transaction.amount), Ccy: transaction.currency)
         builder.DrctDbtTx do
           builder.MndtRltdInf do
             builder.MndtId(transaction.mandate_id)
@@ -161,33 +155,19 @@ module SEPA
               # Both are currently allowed and the actual preference depends on the bank.
               # Also the fields that are required legally may vary depending on the country
               # or change over time.
-              if transaction.debtor_address.street_name
-                builder.StrtNm transaction.debtor_address.street_name
-              end
+              builder.StrtNm transaction.debtor_address.street_name if transaction.debtor_address.street_name
 
-              if transaction.debtor_address.building_number
-                builder.BldgNb transaction.debtor_address.building_number
-              end
+              builder.BldgNb transaction.debtor_address.building_number if transaction.debtor_address.building_number
 
-              if transaction.debtor_address.post_code
-                builder.PstCd transaction.debtor_address.post_code
-              end
+              builder.PstCd transaction.debtor_address.post_code if transaction.debtor_address.post_code
 
-              if transaction.debtor_address.town_name
-                builder.TwnNm transaction.debtor_address.town_name
-              end
+              builder.TwnNm transaction.debtor_address.town_name if transaction.debtor_address.town_name
 
-              if transaction.debtor_address.country_code
-                builder.Ctry transaction.debtor_address.country_code
-              end
+              builder.Ctry transaction.debtor_address.country_code if transaction.debtor_address.country_code
 
-              if transaction.debtor_address.address_line1
-                builder.AdrLine transaction.debtor_address.address_line1
-              end
+              builder.AdrLine transaction.debtor_address.address_line1 if transaction.debtor_address.address_line1
 
-              if transaction.debtor_address.address_line2
-                builder.AdrLine transaction.debtor_address.address_line2
-              end
+              builder.AdrLine transaction.debtor_address.address_line2 if transaction.debtor_address.address_line2
             end
           end
         end

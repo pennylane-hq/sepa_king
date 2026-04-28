@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'sepa_king/version'
@@ -9,7 +11,7 @@ Gem::Specification.new do |s|
   s.email         = ['gl@salesking.eu', 'georg@ledermann.dev']
   s.description   = 'Implemention of Payments Initiation (ISO 20022)'
   s.summary       = 'Ruby gem for creating SEPA XML files'
-  s.homepage      = 'https://github.com/salesking/sepa_king'
+  s.homepage      = 'https://github.com/pennylane-hq/sepa_king'
   s.license       = 'MIT'
 
   s.files         = `git ls-files`.split($/)

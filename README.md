@@ -7,29 +7,25 @@
 
 We love building payment applications! So after developing the [DTAUS library for Ruby](https://github.com/salesking/king_dtaus) we move on with SEPA.
 
-
 ## Features
 
 This gem implements the following two messages out of the ISO 20022 standard:
 
-* Credit Transfer Initiation (`pain.001.003.03`, `pain.001.002.03` and `pain.001.001.03`)
-* Direct Debit Initiation (`pain.008.003.02`, `pain.008.002.02` and `pain.008.001.02`)
+- Credit Transfer Initiation (`pain.001.003.03`, `pain.001.002.03` and `pain.001.001.03`)
+- Direct Debit Initiation (`pain.008.003.02`, `pain.008.002.02` and `pain.008.001.02`)
 
 It handles the _Specification of Data Formats_ v3.3 (2019-11-17).
 
 BTW: **pain** is a shortcut for **Pa**yment **In**itiation.
 
-
 ## Requirements
 
-* Ruby 2.7 or newer
-* ActiveModel 4.2 or newer (including 7.0)
-
+- Ruby 2.7 or newer
+- ActiveModel 4.2 or newer (including 7.0)
 
 ## Installation
 
     gem install sepa_king
-
 
 ## Usage
 
@@ -148,7 +144,6 @@ sdd.add_transaction ...
 xml_string = sdd.to_xml                    # Use schema pain.008.001.02
 xml_string = sdd.to_xml('pain.008.002.02') # Use schema pain.008.002.02
 ```
-
 
 How to create the XML for **Credit Transfer Initiation** (in German: "Überweisungen")
 
@@ -269,25 +264,22 @@ end
 **Beware:** The SEPA::IBANValidator is strict - e.g. it does not allow any spaces in the IBAN.
 
 Also see:
-* [lib/sepa_king/validator.rb](https://github.com/salesking/sepa_king/blob/master/lib/sepa_king/validator.rb)
-* [lib/sepa_king/transaction/direct_debit_transaction.rb](https://github.com/salesking/sepa_king/blob/master/lib/sepa_king/transaction/direct_debit_transaction.rb)
 
+- [lib/sepa_king/validator.rb](https://github.com/salesking/sepa_king/blob/master/lib/sepa_king/validator.rb)
+- [lib/sepa_king/transaction/direct_debit_transaction.rb](https://github.com/salesking/sepa_king/blob/master/lib/sepa_king/transaction/direct_debit_transaction.rb)
 
 ## Changelog
 
 https://github.com/salesking/sepa_king/releases
 
-
 ## Contributors
 
 https://github.com/salesking/sepa_king/graphs/contributors
 
-
 ## Resources
 
-* https://www.ebics.de/de/datenformate
-* SalesKing: http://salesking.eu
-
+- https://www.ebics.de/de/datenformate
+- SalesKing: http://salesking.eu
 
 ## License
 
