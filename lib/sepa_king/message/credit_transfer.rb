@@ -1,20 +1,20 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module SEPA
   class CreditTransfer < Message
     self.account_class = DebtorAccount
     self.transaction_class = CreditTransferTransaction
     self.xml_main_tag = 'CstmrCdtTrfInitn'
-    self.known_schemas = [ PAIN_001_001_03, PAIN_001_001_03_CH_02, PAIN_001_001_09, PAIN_001_003_03, PAIN_001_002_03 ]
+    self.known_schemas = [PAIN_001_001_03, PAIN_001_001_03_CH_02, PAIN_001_001_09, PAIN_001_003_03, PAIN_001_002_03]
 
-  private
+    private
+
     # Find groups of transactions which share the same values of some attributes
     def transaction_group(transaction)
       { requested_date: transaction.requested_date,
-        batch_booking:  transaction.batch_booking,
-        service_level:  transaction.service_level,
-        category_purpose: transaction.category_purpose
-      }
+        batch_booking: transaction.batch_booking,
+        service_level: transaction.service_level,
+        category_purpose: transaction.category_purpose }
     end
 
     def build_payment_informations(builder, schema_name)
@@ -26,7 +26,7 @@ module SEPA
           builder.PmtMtd('TRF')
           builder.BtchBookg(group[:batch_booking])
           builder.NbOfTxs(transactions.length)
-          builder.CtrlSum('%.2f' % amount_total(transactions))
+          builder.CtrlSum(format('%.2f', amount_total(transactions)))
           builder.PmtTpInf do
             if group[:service_level]
               builder.SvcLvl do
@@ -73,9 +73,7 @@ module SEPA
               end
             end
           end
-          if group[:service_level]
-            builder.ChrgBr('SLEV')
-          end
+          builder.ChrgBr('SLEV') if group[:service_level]
 
           transactions.each do |transaction|
             build_transaction(builder, transaction, schema_name)
@@ -87,13 +85,11 @@ module SEPA
     def build_transaction(builder, transaction, schema_name)
       builder.CdtTrfTxInf do
         builder.PmtId do
-          if transaction.instruction.present?
-            builder.InstrId(transaction.instruction)
-          end
+          builder.InstrId(transaction.instruction) if transaction.instruction.present?
           builder.EndToEndId(transaction.reference)
         end
         builder.Amt do
-          builder.InstdAmt('%.2f' % transaction.amount, Ccy: transaction.currency)
+          builder.InstdAmt(format('%.2f', transaction.amount), Ccy: transaction.currency)
         end
         if transaction.bic
           builder.CdtrAgt do
@@ -117,33 +113,19 @@ module SEPA
               # Both are currently allowed and the actual preference depends on the bank.
               # Also the fields that are required legally may vary depending on the country
               # or change over time.
-              if transaction.creditor_address.street_name
-                builder.StrtNm transaction.creditor_address.street_name
-              end
+              builder.StrtNm transaction.creditor_address.street_name if transaction.creditor_address.street_name
 
-              if transaction.creditor_address.building_number
-                builder.BldgNb transaction.creditor_address.building_number
-              end
+              builder.BldgNb transaction.creditor_address.building_number if transaction.creditor_address.building_number
 
-              if transaction.creditor_address.post_code
-                builder.PstCd transaction.creditor_address.post_code
-              end
+              builder.PstCd transaction.creditor_address.post_code if transaction.creditor_address.post_code
 
-              if transaction.creditor_address.town_name
-                builder.TwnNm transaction.creditor_address.town_name
-              end
+              builder.TwnNm transaction.creditor_address.town_name if transaction.creditor_address.town_name
 
-              if transaction.creditor_address.country_code
-                builder.Ctry transaction.creditor_address.country_code
-              end
+              builder.Ctry transaction.creditor_address.country_code if transaction.creditor_address.country_code
 
-              if transaction.creditor_address.address_line1
-                builder.AdrLine transaction.creditor_address.address_line1
-              end
+              builder.AdrLine transaction.creditor_address.address_line1 if transaction.creditor_address.address_line1
 
-              if transaction.creditor_address.address_line2
-                builder.AdrLine transaction.creditor_address.address_line2
-              end
+              builder.AdrLine transaction.creditor_address.address_line2 if transaction.creditor_address.address_line2
             end
           end
         end
