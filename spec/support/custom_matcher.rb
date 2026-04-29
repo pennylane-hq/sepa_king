@@ -11,7 +11,7 @@ RSpec::Matchers.define :validate_against do |xsd|
     expect(@schema).to be_valid(@doc)
   end
 
-  failure_message do |_actual|
+  failure_message do
     # Return the validation errors as string
     @schema.validate(@doc).join("\n")
   end
